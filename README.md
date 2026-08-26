@@ -33,12 +33,48 @@ a versão dela, que passou de 98 pra 2010), e nas bibliotecas desde então:
 
 ## Pré-requisitos
 
-GHC/GHCup instalados (`ghc`, `ghci` no PATH). Testado com GHC 9.14.1, mas
-qualquer GHC razoavelmente recente deve funcionar legal também.
+1. `git`, pra clonar este repositório
 
-`python3` com o pacote `rich` (`pip install rich`, ou use o `uv`), pra colorir
-o output do `autopatch.py` - verde pra patch aplicado, amarelo pra "já
-tava corrigido"/aviso de atenção manual, vermelho pra falha mais grave.
+2. GHCup instalado (isto é, `ghc` e `ghci` no PATH). Atualmente está testado
+com GHC 9.14.1, mas qualquer GHC razoavelmente recente deve funcionar legal.
+
+2. [`uv`](https://docs.astral.sh/uv/) instalado (`uv` no PATH). É ele quem
+cuida do Python e do pacote `rich` sozinho (via `uv run`). Ele faz com que
+não seja preciso instalar Python nem dar `pip install` manualmente. O pacote
+`rich` é só pra colorir o output do `autopatch.py`.
+
+## Instalando do zero (git, GHCup, uv)
+
+Abaixo, o tutorial de como obter o ambiente necessário, tanto Linux quanto Windows.
+
+### Linux
+
+```bash
+# git, se a distro não vier com ele
+sudo apt install git     # Debian/Ubuntu - troque pro gerenciador da sua distro
+
+# GHCup (instala ghc/ghci/cabal)
+curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+
+# uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Windows (PowerShell)
+
+```powershell
+winget install --id Git.Git -e
+winget install --id astral-sh.uv -e
+```
+
+GHCup: ver o pré-requisito acima, o instalador oficial pra Windows já é
+um script próprio (https://www.haskell.org/ghcup/).
+
+Depois de instalar o Git, abra o **Git Bash** (vem instalado junto)
+em vez do PowerShell puro. Olha que legal: os scripts deste repo
+(`fetch.sh`, `check-haskell.sh`) são bash e rodam direto nele, sem
+precisar reescrever nada em `.ps1`. A partir do próximo passo
+(seção "Passo a passo"), é tudo idêntico em Linux e Windows.
 
 ## Passo a passo
 
@@ -71,7 +107,7 @@ em `ghc-errors.log`.
 ### 3. Aplicar os patches
 
 ```bash
-python3 autopatch.py
+uv run autopatch.py
 ```
 
 Lê o `ghc-errors.log` gerado no passo anterior e corrige **sozinho** tudo que
@@ -86,7 +122,7 @@ convergir (não sobrar mais nada reconhecido pra corrigir) ou até um
 _limite de 10 rodadas_.
 
 Essa automação evita ter que alternar `check-haskell.sh` / `autopatch.py`
-na mão: um único `python3 autopatch.py` já parte de um `full-code/` recém-baixado
+na mão: um único `uv run autopatch.py` já parte de um `full-code/` recém-baixado
 (sem `ghc-errors.log` nenhum, sem nem precisar rodar `check-haskell.sh` antes) e
 deixa tudo corrigido.
 
