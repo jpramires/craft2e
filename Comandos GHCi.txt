@@ -1,0 +1,17 @@
+Comandos GHCi
+
+:l Arquivo.hs (ou :load)       carrega o módulo (e dependências)
+:r (ou :reload)                recarrega o que já tá carregado
+:t expr (ou :type)             mostra o tipo de uma expressão, sem avaliar
+:i nome (ou :info)             assinatura, onde definido, instâncias, fixidade
+:k Tipo (ou :kind)             kind de um tipo
+:main [args]                   roda main como se fosse o executável, com args opcionais
+:m + Data.List (ou :module)    importa um módulo extra só nessa sessão
+:browse Modulo                 lista tudo que um módulo exporta
+:show modules                  lista o que tá carregado agora
+:show imports                  lista o que tá importado no escopo atual
+:set -Wall / :set -XNome       liga warnings/extensões pra sessão
+:!comando                      roda um comando do shell sem sair do ghci
+:cd caminho                    muda o diretório de trabalho do ghci
+:{ ... :}                      bloco multi-linhaequações direto no prompt
+:q (ou :quit)                  sai

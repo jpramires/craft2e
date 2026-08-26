@@ -1,0 +1,44 @@
+-- Arquivo de configuração do GHCi
+-- Só é carregado se rodar `ghci` a partir da raiz desse repo
+
+-- Onde procurar o módulo quando um arquivo faz `import <módulo>`
+-- O formato fica engraçado, mas é uma lista separada por `:`
+--   .                  -> raiz do repo (onde está o `OldPrelude.hs`)
+--   full-code/AbsTypes -> só pro Chapter17.hs (único arquivo de nível raiz
+--                         que importa Set/Relation, que só existem lá)
+--   full-code          -> onde o código do livro foi descompactado (acha
+--                         Pictures.hs, Chapter*.hs etc.)
+:set -i.:full-code/AbsTypes:full-code
+
+-- `:cl caminho/Arquivo.hs` = como `:l`, mas primeiro recalcula o -i pra
+-- incluir a pasta do PRÓPRIO arquivo (equivalente ao que o check-haskell.sh
+-- faz por fora, por arquivo, com `-i"$d"`). Precisa disso pra carregar
+-- interativamente qualquer coisa de dentro de 
+-- `Huffman/`, `Calculator/`, `AbsTypes/`, `IO/`, `Parsing/` ou `Simulation/`
+-- que importe um vizinho da mesma pasta (ex.: `Huffman/Coding.hs` importa `Huffman/Types.hs`) -
+-- coisa que `:l` sozinho não recalcula, e nem devia ser o -i default fixo:
+-- nomes de módulo tipo Store/Types/ParseLib/MonadIO existem repetidos em
+-- pastas diferentes, então só faz sentido priorizar a pasta de quem tá
+-- importando, um arquivo por vez (não dá pra deixar todas as pastas juntas
+-- no path default sem arriscar pegar o vizinho errado).
+--
+-- (Chamamos de `:cl` e não `:load` porque o GHCi não permite sobrescrever
+-- o comando `:load` embutido via `:def`)
+:m +System.FilePath
+:{
+let craftLoad arg = do
+      let dir = takeDirectory arg
+          ipath
+            | dir == "full-code" = ".:full-code/AbsTypes:full-code"
+            | otherwise          = ".:" ++ dir ++ ":full-code/AbsTypes:full-code"
+      return (":set -i" ++ ipath ++ "\n:load " ++ arg)
+:}
+:def cl craftLoad
+
+-- Qualidade de vida: mostra o(s) módulo(s) carregado(s) no prompt em vez
+-- de "ghci>" genérico (ajuda a saber onde você está depois de vários :l)
+--
+-- Também mostra o tipo de toda expressão avaliada
+-- (bom pra fixar tipos enquanto lê o livro)
+:set prompt "%s> "
+:set +t
